@@ -13,6 +13,7 @@ var apiController = {};
 
 apiController.getConfig = function(req, res, next) {
 	var config = {};
+    config.cdn_url = nconf.get('cdn_url');
 	config.relative_path = nconf.get('relative_path');
 	config.socketioTransports = nconf.get('socket.io:transports') || ['polling', 'websocket'];
 	config.websocketAddress = nconf.get('socket.io:address') || '';
