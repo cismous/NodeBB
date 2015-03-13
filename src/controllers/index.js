@@ -202,8 +202,7 @@ Controllers.robots = function (req, res) {
 		res.send(meta.config["robots.txt"]);
 	} else {
 		res.send("User-agent: *\n" +
-			"Disallow: " + nconf.get('relative_path') + "/admin/\n" +
-			"Sitemap: " + nconf.get('url') + "/sitemap.xml");
+			"Disallow: " + nconf.get('relative_path') + "/");
 	}
 };
 
