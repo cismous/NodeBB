@@ -26,10 +26,10 @@ define('forum/popular', ['forum/recent', 'forum/infinitescroll'], function(recen
 				return false;
 			}
 		});
-	};
+	}
 
 	function getActiveSection() {
-		parts = window.location.href.split('/');
+		var parts = window.location.href.split('/');
 		return parts[parts.length - 1];
 	}
 
