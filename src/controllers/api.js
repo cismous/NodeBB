@@ -57,6 +57,7 @@ apiController.getConfig = function(req, res, next) {
 	config['css-buster'] = meta.css.hash;
 	config.requireEmailConfirmation = parseInt(meta.config.requireEmailConfirmation, 10) === 1;
 	config.topicPostSort = meta.config.topicPostSort || 'oldest_to_newest';
+    config.votePostSort = meta.config.votePostSort || 'oldest_to_newest';
 	config.categoryTopicSort = meta.config.categoryTopicSort || 'newest_to_oldest';
 	config.csrf_token = req.csrfToken();
 	config.searchEnabled = plugins.hasListeners('filter:search.query');

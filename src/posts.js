@@ -181,6 +181,28 @@ var async = require('async'),
 		});
 	};
 
+    Posts.getVidIndex = function(vid, uid, callback) {
+        async.parallel({
+            settings: function(next) {
+                user.getSettings(uid, next);
+            },
+            vid: function(next) {
+                Posts.getPostField(vid, 'vid', next);
+            }
+        }, function(err, results) {
+            if(err) {
+                return callback(err);
+            }
+            var set = results.settings.votePostSort === 'most_votes' ? 'vid:' + results.vid + ':posts:votes' : 'vid:' + results.vid + ':posts';
+            db.sortedSetRank(set, vid, function(err, index) {
+                if (!utils.isNumber(index)) {
+                    return callback(err, 1);
+                }
+                callback(err, parseInt(index, 10) + 2);
+            });
+        });
+    };
+
 	Posts.getPidIndex = function(pid, uid, callback) {
 		async.parallel({
 			settings: function(next) {

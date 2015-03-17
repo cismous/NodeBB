@@ -37,6 +37,12 @@ function staticRoutes(app, middleware, controllers) {
 	setupPageRoute(app, '/500', middleware, [], controllers.static['500']);
 }
 
+function voteRoutes(app, middleware, controllers) {
+    setupPageRoute(app, '/vote/:vote_id/:slug/:post_index?', middleware, [], controllers.votes.get);
+    setupPageRoute(app, '/vote/:vote_id/:slug?', middleware, [middleware.addSlug], controllers.votes.get);
+    setupPageRoute(app, '/vote/', middleware, [], controllers.votes.home);
+}
+
 function topicRoutes(app, middleware, controllers) {
 	app.get('/api/topic/teaser/:topic_id', controllers.topics.teaser);
 
@@ -138,6 +144,7 @@ module.exports = function(app, middleware) {
 
 	mainRoutes(router, middleware, controllers);
 	staticRoutes(router, middleware, controllers);
+    voteRoutes(router, middleware, controllers);
 	topicRoutes(router, middleware, controllers);
 	tagRoutes(router, middleware, controllers);
 	categoryRoutes(router, middleware, controllers);

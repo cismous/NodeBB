@@ -98,6 +98,8 @@ middleware.addSlug = function(req, res, next) {
 			return redirect(categories.getCategoryField, req.params.category_id, '/category/');
 		} else if (req.params.topic_id) {
 			return redirect(topics.getTopicField, req.params.topic_id, '/topic/');
+        } else if (req.params.vote_id) {
+            return redirect(topics.getTopicField, req.params.vote_id, '/vote/');
 		}
 	}
 	next();

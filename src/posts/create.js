@@ -7,13 +7,13 @@ var async = require('async'),
 	plugins = require('../plugins'),
 	user = require('../user'),
 	topics = require('../topics'),
+    votes = require('../votes'),
 	categories = require('../categories');
 
 
 module.exports = function(Posts) {
 	Posts.create = function(data, callback) {
 		var uid = data.uid,
-			tid = data.tid,
 			content = data.content,
 			timestamp = data.timestamp || Date.now();
 
@@ -32,7 +32,6 @@ module.exports = function(Posts) {
 				postData = {
 					'pid': pid,
 					'uid': uid,
-					'tid': tid,
 					'content': content,
 					'timestamp': timestamp,
 					'reputation': 0,
@@ -41,6 +40,12 @@ module.exports = function(Posts) {
 					'edited': 0,
 					'deleted': 0
 				};
+
+                if(data.tid) {
+                    postData.tid = data.tid;
+                } else if(data.vid) {
+                    postData.vid = data.vid;
+                }
 
 				if (data.toPid) {
 					postData.toPid = data.toPid;
@@ -65,7 +70,11 @@ module.exports = function(Posts) {
 						user.onNewPostMade(postData, next);
 					},
 					function(next) {
-						topics.onNewPostMade(postData, next);
+                        if(data.tid) {
+                            topics.onNewPostMade(postData, next);
+                        } else if(data.vid) {
+                            votes.onNewPostMade(postData, next);
+                        }
 					},
 					function(next) {
 						categories.onNewPostMade(postData, next);

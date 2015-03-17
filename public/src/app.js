@@ -109,6 +109,9 @@ app.uid = null;
 				case 'unread':
 					room = 'recent_posts';
 				break;
+                case 'vote':
+                    room = 'vote';
+                break;
 				case 'admin':
 					room = 'admin';
 				break;

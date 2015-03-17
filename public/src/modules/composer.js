@@ -28,7 +28,7 @@ define('composer', [
 	}
 
 	function alreadyOpen(post) {
-		// If a composer for the same cid/tid/pid is already open, return the uuid, else return bool false
+		// If a composer for the same cid/tid/pid/vid is already open, return the uuid, else return bool false
 		var	type, id;
 
 		if (post.hasOwnProperty('cid')) {
@@ -37,6 +37,8 @@ define('composer', [
 			type = 'tid';
 		} else if (post.hasOwnProperty('pid')) {
 			type = 'pid';
+        } else if (post.hasOwnProperty('vid')) {
+            type = 'vid';
 		}
 
 		id = post[type];
@@ -61,11 +63,17 @@ define('composer', [
 			return composer.load(existingUUID);
 		}
 
-		translator.translate('[[topic:composer.new_topic]]', function(newTopicStr) {
-			taskbar.push('composer', uuid, {
-				title: post.title ? post.title : newTopicStr
-			});
-		});
+        if (post.vid) {
+            taskbar.push('composer', uuid, {
+                title: '新投票'
+            });
+        } else {
+            translator.translate('[[topic:composer.new_topic]]', function(newTopicStr) {
+                taskbar.push('composer', uuid, {
+                    title: post.title ? post.title : newTopicStr
+                });
+            });
+        }
 
 		// Construct a save_id
 		if (0 !== parseInt(app.uid, 10)) {
@@ -75,6 +83,8 @@ define('composer', [
 				post.save_id = ['composer', app.uid, 'tid', post.tid].join(':');
 			} else if (post.hasOwnProperty('pid')) {
 				post.save_id = ['composer', app.uid, 'pid', post.pid].join(':');
+            } else if (post.hasOwnProperty('vid')) {
+                post.save_id = ['composer', app.uid, 'vid', post.vid].join(':');
 			}
 		}
 
@@ -97,6 +107,15 @@ define('composer', [
 	composer.addButton = function(iconClass, onClick) {
 		formatting.addButton(iconClass, onClick);
 	};
+
+    composer.newVote = function() {
+        push({
+            vid: 1,
+            body: '',
+            modified: false,
+            isMain: true
+        });
+    };
 
 	composer.newTopic = function(cid) {
 		push({
@@ -217,6 +236,7 @@ define('composer', [
 	function createNewComposer(post_uuid) {
 		var allowTopicsThumbnail = config.allowTopicsThumbnail && composer.posts[post_uuid].isMain && (config.hasImageUploadPlugin || config.allowFileUploads),
 			isTopic = composer.posts[post_uuid] ? !!composer.posts[post_uuid].cid : false,
+            isVote = composer.posts[post_uuid] ? !!composer.posts[post_uuid].vid : false,
 			isMain = composer.posts[post_uuid] ? !!composer.posts[post_uuid].isMain : false,
 			isEditing = composer.posts[post_uuid] ? !!composer.posts[post_uuid].pid : false,
 			isGuestPost = composer.posts[post_uuid] ? composer.posts[post_uuid].uid === '0' : null;
@@ -227,8 +247,9 @@ define('composer', [
 
 		var data = {
 			allowTopicsThumbnail: allowTopicsThumbnail,
-			showTags: isTopic || isMain,
+			showTags: (isTopic || isMain) && !isVote,
 			isTopic: isTopic,
+            isVote: isVote,
 			showHandleInput: (app.user.uid === 0 || (isEditing && isGuestPost && app.user.isAdmin)) && config.allowGuestHandles,
 			handle: composer.posts[post_uuid] ? composer.posts[post_uuid].handle || '' : undefined
 		};
@@ -386,9 +407,13 @@ define('composer', [
 			handleEl = postContainer.find('.handle'),
 			titleEl = postContainer.find('.title'),
 			bodyEl = postContainer.find('textarea'),
+            username = postContainer.find('#username'),
+            email = postContainer.find('#email'),
 			thumbEl = postContainer.find('input#topic-thumb-url');
 
-		titleEl.val(titleEl.val().trim());
+        if (titleEl.val()) {
+            titleEl.val(titleEl.val().trim());
+        }
 		bodyEl.val(bodyEl.val().trim());
 		if (thumbEl.length) {
 			thumbEl.val(thumbEl.val().trim());
@@ -409,6 +434,11 @@ define('composer', [
 		} else if (bodyEl.val().length > parseInt(config.maximumPostLength, 10)) {
 			return composerAlert('[[error:content-too-long, ' + config.maximumPostLength + ']]');
 		}
+
+        var isVid = !!parseInt(postData.vid, 10);
+        if (isVid) {
+            //TODO validateEmail and username
+        }
 
 		var composerData = {}, action;
 
@@ -452,6 +482,23 @@ define('composer', [
 
 			action = 'posts.edit';
 			socket.emit(action, composerData, done);
+        } else if (parseInt(postData.vid, 10) > 0) {
+            composerData = {
+                handle: handleEl ? handleEl.val() : undefined,
+                content: bodyEl.val(),
+                email: email.val(),
+                vid: postData.vid,
+                username: username.val()
+            };
+
+            action = 'votes.post';
+            socket.emit(action, composerData, function(err, vote) {
+                done(err);
+
+                if (!err) {
+                    ajaxify.go('vote/' + vote.slug);
+                }
+            });
 		}
 
 		function done(err) {
