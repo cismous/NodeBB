@@ -6,6 +6,7 @@ var async = require('async'),
 
 	posts = require('../posts'),
 	topics = require('../topics'),
+    votes = require('../votes'),
 	user = require('../user'),
 	helpers = require('./helpers'),
 	groups = require('../groups'),
@@ -26,7 +27,7 @@ module.exports = function(privileges) {
 			},
 			isAdministrator: function(next) {
 				user.isAdministrator(uid, next);
-			},
+			}
 		}, function(err, userResults) {
 			if(err) {
 				return callback(err);
