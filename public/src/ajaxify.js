@@ -288,7 +288,9 @@ $(document).ready(function() {
 						// Internal link
 						var url = this.href.replace(rootUrl + '/', '');
 						// 如果用户没有登录，点击任何链接都将指向登录页面
-						if (url !== '') {
+						if ((location.pathname === '/' && this.pathname === '/login') || url !== '/login' && this.pathname === '/') {
+							return;
+						} else if (url !== '') {
 							url = config.loggedIn ? url : 'login';
 						}
 

@@ -359,7 +359,12 @@ middleware.renderHeader = function(req, res, callback) {
 			templateValues.customJS = results.customJS;
 			templateValues.maintenanceHeader = parseInt(meta.config.maintenanceMode, 10) === 1 && !results.isAdmin;
 
-			app.render('header', templateValues, callback);
+			if ((!req.user || parseInt(req.user.uid, 10) === 0) && req.url === '/') {
+				templateValues.welcome = 'welcome';
+				app.render('welcome-header', templateValues, callback);
+			} else {
+				app.render('header', templateValues, callback);
+			}
 		});
 	});
 };
