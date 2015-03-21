@@ -64,8 +64,6 @@ $(document).ready(function() {
 			// Remove relative path and trailing slash
 			url = ajaxify.removeRelativePath(url.replace(/\/$/, ''));
 
-			console.log(url);
-			console.log(ajaxify.getTemplateMapping(url));
 			var tpl_url = ajaxify.getTemplateMapping(url);
 
 			$(window).trigger('action:ajaxify.start', {url: url, tpl_url: tpl_url});
