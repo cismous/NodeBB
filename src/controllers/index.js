@@ -92,7 +92,11 @@ Controllers.home = function(req, res, next) {
 						categories.getRecentTopicReplies(childCategories, uid, next);
 					}
 				], function(err) {
-					next(err, categoryData);
+					if (!req.user || parseInt(req.user.uid, 10) === 0) {
+						next(err, {});
+					} else {
+						next(err, categoryData);
+					}
 				});
 			});
 		}
