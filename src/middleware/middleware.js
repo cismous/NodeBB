@@ -67,6 +67,15 @@ middleware.redirectToAccountIfLoggedIn = function(req, res, next) {
 	});
 };
 
+// 未登录时，跳转到首页
+middleware.redirectToHomeIfGuest = function(req, res, next) {
+	if (!req.user || parseInt(req.user.uid, 10) === 0) {
+		return res.redirect(nconf.get('relative_path') + '/');
+	} else {
+		next();
+	}
+};
+
 middleware.redirectToLoginIfGuest = function(req, res, next) {
 	if (!req.user || parseInt(req.user.uid, 10) === 0) {
 		req.session.returnTo = nconf.get('relative_path') + req.url.replace(/^\/api/, '');

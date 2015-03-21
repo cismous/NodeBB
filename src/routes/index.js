@@ -21,6 +21,7 @@ function mainRoutes(app, middleware, controllers) {
 	setupPageRoute(app, '/', middleware, [], controllers.home);
 
 	var loginRegisterMiddleware = [middleware.redirectToAccountIfLoggedIn];
+	var loginMiddleware = [middleware.redirectToHomeIfGuest];
 
 	setupPageRoute(app, '/login', middleware, loginRegisterMiddleware, controllers.login);
 	setupPageRoute(app, '/register', middleware, loginRegisterMiddleware, controllers.register);
@@ -121,9 +122,33 @@ module.exports = function(app, middleware) {
 
 	app.use(middleware.maintenanceMode);
 
+	// 以下链接未登录时，跳转到首页
+	var toHomePath = [
+		'confirm/?*',
+		'outgoing',
+		'search/?*',
+		'reset/?*',
+		'tos',
+		'topic/?*',
+		'tags/?*',
+		'popular/?*',
+		'recent',
+		'unread',
+		'category/?*',
+		'user/?*',
+		'notifications',
+		'chats/?*',
+		'users/?*',
+		'groups/?*',
+		'admin/?*'
+	];
+	for(var i = 0, pathNumber = toHomePath.length; i < pathNumber; i++) {
+		app.all(relativePath + '/' + toHomePath[i], middleware.redirectToHomeIfGuest);
+	}
+
 	app.all(relativePath + '/api/?*', middleware.prepareAPI);
 	app.all(relativePath + '/api/admin/?*', middleware.isAdmin);
-	app.all(relativePath + '/admin/?*', middleware.ensureLoggedIn, middleware.applyCSRF, middleware.isAdmin);
+	app.all(relativePath + '/admin/?*', middleware.redirectToHomeIfGuest, middleware.ensureLoggedIn, middleware.applyCSRF, middleware.isAdmin);
 
 	adminRoutes(router, middleware, controllers);
 	metaRoutes(router, middleware, controllers);
