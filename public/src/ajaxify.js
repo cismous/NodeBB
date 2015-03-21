@@ -64,6 +64,8 @@ $(document).ready(function() {
 			// Remove relative path and trailing slash
 			url = ajaxify.removeRelativePath(url.replace(/\/$/, ''));
 
+			console.log(url);
+			console.log(ajaxify.getTemplateMapping(url));
 			var tpl_url = ajaxify.getTemplateMapping(url);
 
 			$(window).trigger('action:ajaxify.start', {url: url, tpl_url: tpl_url});
@@ -287,6 +289,9 @@ $(document).ready(function() {
 					if (this.host === '' || this.host === window.location.host) {
 						// Internal link
 						var url = this.href.replace(rootUrl + '/', '');
+						if (url !== '') {
+							url = config.loggedIn ? url : 'login';
+						}
 
 						if(window.location.pathname === this.pathname && this.hash) {
 							if (this.hash !== window.location.hash) {
