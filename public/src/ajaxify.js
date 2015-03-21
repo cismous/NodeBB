@@ -289,6 +289,7 @@ $(document).ready(function() {
 					if (this.host === '' || this.host === window.location.host) {
 						// Internal link
 						var url = this.href.replace(rootUrl + '/', '');
+						// 如果用户没有登录，点击任何链接都将指向登录页面
 						if (url !== '') {
 							url = config.loggedIn ? url : 'login';
 						}
