@@ -30,7 +30,7 @@ questions.main = [
 			(nconf.get('base_url') ? (nconf.get('base_url') + (nconf.get('use_port') ? ':' + nconf.get('port') : '')) : null) ||	// backwards compatibility (remove for v0.7.0)
 			'http://localhost:4567',
 		pattern: /^http(?:s)?:\/\//,
-		message: 'Base URL must begin with \'http://\' or \'https://\'',
+		message: 'Base URL must begin with \'http://\' or \'https://\''
 	},
 	{
 		name: 'secret',
