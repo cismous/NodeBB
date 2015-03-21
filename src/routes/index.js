@@ -21,7 +21,6 @@ function mainRoutes(app, middleware, controllers) {
 	setupPageRoute(app, '/', middleware, [], controllers.home);
 
 	var loginRegisterMiddleware = [middleware.redirectToAccountIfLoggedIn];
-	var loginMiddleware = [middleware.redirectToHomeIfGuest];
 
 	setupPageRoute(app, '/login', middleware, loginRegisterMiddleware, controllers.login);
 	setupPageRoute(app, '/register', middleware, loginRegisterMiddleware, controllers.register);
