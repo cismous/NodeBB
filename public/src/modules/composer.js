@@ -61,7 +61,8 @@ define('composer', [
 			return composer.load(existingUUID);
 		}
 
-		translator.translate('[[topic:composer.new_topic]]', function(newTopicStr) {
+		var taskbarTitle = post.vid ? '[[vote:composer.new_vote]]' : '[[topic:composer.new_topic]]';
+		translator.translate(taskbarTitle, function(newTopicStr) {
 			taskbar.push('composer', uuid, {
 				title: post.title ? post.title : newTopicStr
 			});
@@ -75,6 +76,8 @@ define('composer', [
 				post.save_id = ['composer', app.uid, 'tid', post.tid].join(':');
 			} else if (post.hasOwnProperty('pid')) {
 				post.save_id = ['composer', app.uid, 'pid', post.pid].join(':');
+			} else if (post.hasOwnProperty('vid')) {
+				post.save_id = ['composer', app.uid, 'vid', post.vid].join(':');
 			}
 		}
 
@@ -110,7 +113,7 @@ define('composer', [
 
 	composer.newVote = function() {
 		push({
-			title: '',
+			vid: 1,
 			body: '',
 			modified: false,
 			isMain: true
@@ -226,6 +229,7 @@ define('composer', [
 	function createNewComposer(post_uuid) {
 		var allowTopicsThumbnail = config.allowTopicsThumbnail && composer.posts[post_uuid].isMain && (config.hasImageUploadPlugin || config.allowFileUploads),
 			isTopic = composer.posts[post_uuid] ? !!composer.posts[post_uuid].cid : false,
+			isVote = composer.posts[post_uuid] ? !!composer.posts[post_uuid].vid : false,
 			isMain = composer.posts[post_uuid] ? !!composer.posts[post_uuid].isMain : false,
 			isEditing = composer.posts[post_uuid] ? !!composer.posts[post_uuid].pid : false,
 			isGuestPost = composer.posts[post_uuid] ? composer.posts[post_uuid].uid === '0' : null;
@@ -233,11 +237,15 @@ define('composer', [
 		composer.bsEnvironment = utils.findBootstrapEnvironment();
 
 		var template = (composer.bsEnvironment === 'xs' || composer.bsEnvironment === 'sm') ? 'composer-mobile' : 'composer';
+		if (isVote) {
+			template = (composer.bsEnvironment === 'xs' || composer.bsEnvironment === 'sm') ? 'votes/composer-mobile' : 'votes/composer';
+		}
 
 		var data = {
 			allowTopicsThumbnail: allowTopicsThumbnail,
 			showTags: isTopic || isMain,
 			isTopic: isTopic,
+			isVote: isVote,
 			showHandleInput: (app.user.uid === 0 || (isEditing && isGuestPost && app.user.isAdmin)) && config.allowGuestHandles,
 			handle: composer.posts[post_uuid] ? composer.posts[post_uuid].handle || '' : undefined
 		};
@@ -395,9 +403,13 @@ define('composer', [
 			handleEl = postContainer.find('.handle'),
 			titleEl = postContainer.find('.title'),
 			bodyEl = postContainer.find('textarea'),
+			username = postContainer.find('#username'),
+			email = postContainer.find('#email'),
 			thumbEl = postContainer.find('input#topic-thumb-url');
 
-		titleEl.val(titleEl.val().trim());
+		if (titleEl.val()) {
+			titleEl.val(titleEl.val().trim());
+		}
 		bodyEl.val(bodyEl.val().trim());
 		if (thumbEl.length) {
 			thumbEl.val(thumbEl.val().trim());
@@ -417,6 +429,11 @@ define('composer', [
 			return composerAlert('[[error:content-too-short, ' + config.minimumPostLength + ']]');
 		} else if (bodyEl.val().length > parseInt(config.maximumPostLength, 10)) {
 			return composerAlert('[[error:content-too-long, ' + config.maximumPostLength + ']]');
+		}
+
+		var isVid = !!parseInt(postData.vid, 10);
+		if (isVid) {
+			//TODO validateEmail and username
 		}
 
 		var composerData = {}, action;
@@ -461,6 +478,23 @@ define('composer', [
 
 			action = 'posts.edit';
 			socket.emit(action, composerData, done);
+		} else if (parseInt(postData.vid, 10) > 0) {
+			composerData = {
+				handle: handleEl ? handleEl.val() : undefined,
+				content: bodyEl.val(),
+				email: email.val(),
+				vid: postData.vid,
+				username: username.val()
+			};
+
+			action = 'votes.post';
+			socket.emit(action, composerData, function(err, vote) {
+				done(err);
+
+				if (!err) {
+					ajaxify.go('votes/' + vote.slug);
+				}
+			});
 		}
 
 		function done(err) {
