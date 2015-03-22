@@ -144,7 +144,8 @@ module.exports = function(app, middleware) {
 		'chats/?*',
 		'users/?*',
 		'groups/?*',
-		'api/*/*',
+		'api/category/?*',
+		'api/topic/?*',
 		'admin/?*'
 	];
 	for(var i = 0, pathNumber = toHomePath.length; i < pathNumber; i++) {
