@@ -98,6 +98,11 @@ function groupRoutes(app, middleware, controllers) {
 	setupPageRoute(app, '/groups/:slug/members', middleware, middlewares, controllers.groups.members);
 }
 
+function votesRoutes(app, middleware, controllers) {
+	setupPageRoute(app, '/votes', middleware, [], controllers.votes.list);
+	setupPageRoute(app, '/votes/:slug', middleware, [], controllers.votes.details);
+}
+
 function setupPageRoute(router, name, middleware, middlewares, controller) {
 	middlewares = middlewares.concat([middleware.pageView]);
 
@@ -169,6 +174,7 @@ module.exports = function(app, middleware) {
 	accountRoutes(router, middleware, controllers);
 	userRoutes(router, middleware, controllers);
 	groupRoutes(router, middleware, controllers);
+	votesRoutes(router, middleware, controllers);
 
 	app.use(relativePath, pluginRouter);
 	app.use(relativePath, router);
