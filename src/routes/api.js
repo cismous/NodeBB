@@ -68,7 +68,7 @@ function getTemplatesListing(req, res, next) {
 
 				plugins.fireHook('filter:templates.get_config', config, next);
 			});
-		},
+		}
 	}, function(err, results) {
 		if (err) {
 			return next(err);
