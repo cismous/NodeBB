@@ -373,7 +373,7 @@ app.uid = null;
 				}
 			}
 		});
-	}
+	};
 
 	function createHeaderTooltips() {
 		if (utils.findBootstrapEnvironment() === 'xs') {
