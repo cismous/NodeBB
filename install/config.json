@@ -2,12 +2,17 @@
   "url": "http://localhost:4567",
   "secret": "12e67942-ef45-4883-84f9-15ca8018b22f",
   "database": "mongo",
-  "cdn_url": "7xi2l1.com1.z0.glb.clouddn.com",
   "mongo": {
     "host": "127.0.0.1",
     "port": "27017",
     "username": "",
     "password": "",
-    "database": "10"
+    "database": "11"
+  },
+  "redis": {
+    "host": "127.0.0.1",
+    "port": "6379",
+    "password": "",
+    "database": "2"
   }
 }
