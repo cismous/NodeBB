@@ -18,6 +18,8 @@
 		"^user/[^\/]+": "account/profile",
 		"^reset/.*": "reset_code",
 		"^tags/.*": "tag",
+        "^votes/?$": "votes/list",
+        "^votes/.*": "votes/details",
 		"^groups/?$": "groups/list",
 		"^groups/.*": "groups/details"
 	},

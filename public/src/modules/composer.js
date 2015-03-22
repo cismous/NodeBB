@@ -108,6 +108,15 @@ define('composer', [
 		});
 	};
 
+	composer.newVote = function() {
+		push({
+			title: '',
+			body: '',
+			modified: false,
+			isMain: true
+		});
+	};
+
 	composer.addQuote = function(tid, topicSlug, postIndex, pid, title, username, text) {
 		var uuid = composer.active;
 
