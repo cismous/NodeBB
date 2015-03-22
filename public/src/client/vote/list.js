@@ -20,7 +20,7 @@ define('forum/votes/list', ['composer', 'navigator'], function (composer, naviga
 		socket.on('event:new_vote', VotesList.onNewVote);
 
 		$('#new_vote').on('click', function () {
-			composer.newTopic();
+			composer.newVote();
 		});
 	};
 
